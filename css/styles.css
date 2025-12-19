@@ -485,6 +485,12 @@ body {
     color: white;
 }
 
+.player-status.danger {
+    background: linear-gradient(135deg, var(--red) 0%, #ff6b6b 100%);
+    color: white;
+    animation: pulse 0.5s infinite;
+}
+
 /* Played Cards Grid */
 .played-cards {
     display: grid;

@@ -212,6 +212,9 @@ export class PazaakUI {
         } else if (playerState.standing) {
             element.textContent = 'STANDING';
             element.classList.add('standing');
+        } else if (playerState.score > 20) {
+            element.textContent = 'OVER 20!';
+            element.classList.add('danger');
         } else {
             element.textContent = '';
         }

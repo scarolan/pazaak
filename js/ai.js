@@ -27,8 +27,8 @@ export class PazaakAI {
         // Re-check state after drawing
         const newState = this.game.getGameState();
 
-        // If busted after drawing, try to recover with a minus card
-        if (newState.opponent.busted) {
+        // If over 20 after drawing, try to recover with a minus card
+        if (newState.opponent.score > 20) {
             const recoveryCard = this.findCardToReduce(newState.opponent.score,
                 newState.opponent.sideCards.filter(c => !c.used));
 
@@ -38,16 +38,18 @@ export class PazaakAI {
                 this.game.opponentPlaySideCard(recoveryCard.card.id, recoveryCard.sign);
                 this.game.notifyStateChange();
 
-                // Check if we're still busted
+                // Check if we're still over 20
                 const afterRecovery = this.game.getGameState();
-                if (afterRecovery.opponent.busted) {
-                    // Still busted, round over - AI loses
+                if (afterRecovery.opponent.score > 20) {
+                    // Still over 20, bust and end round - AI loses
+                    this.game.opponent.busted = true;
                     this.game.endRound();
                     return;
                 }
                 // Recovered! Continue with turn (might stand now)
             } else {
-                // No recovery possible, round over - AI loses
+                // No recovery possible, bust and end round - AI loses
+                this.game.opponent.busted = true;
                 this.game.endRound();
                 return;
             }
@@ -73,10 +75,11 @@ export class PazaakAI {
             this.game.notifyStateChange();
             await this.delay(400);
 
-            // Check if busted or auto-stood after playing side card
+            // Check if over 20 or auto-stood after playing side card
             const afterSideCard = this.game.getGameState();
-            if (afterSideCard.opponent.busted) {
-                // Busted after playing side card - round over
+            if (afterSideCard.opponent.score > 20) {
+                // Over 20 after playing side card - bust and end round
+                this.game.opponent.busted = true;
                 this.game.endRound();
                 return;
             }

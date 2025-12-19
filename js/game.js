@@ -50,16 +50,16 @@ export class Player {
             return sum + card.getEffectiveValue(card.chosenSign);
         }, 0);
 
-        if (this.score > 20) {
-            this.busted = true;
-        } else {
-            // Score is valid (20 or under) - not busted
+        // Don't immediately bust when over 20 - player can use side deck cards to reduce score
+        // Only auto-stand at exactly 20 (Pazaak!)
+        if (this.score === 20) {
+            this.standing = true;
             this.busted = false;
-            if (this.score === 20) {
-                // Auto-stand at 20 - it's a Pazaak!
-                this.standing = true;
-            }
+        } else if (this.score < 20) {
+            this.busted = false;
         }
+        // If score > 20, don't set busted yet - let player try to save with side deck cards
+        // Busting is handled when player ends turn or stands while over 20
     }
 
     canPlaySideCard() {
@@ -94,7 +94,7 @@ export class PazaakGame {
         this.state = GameState.WAITING;
         this.currentTurn = null;
         this.roundNumber = 1;
-        this.firstPlayer = 'player'; // alternates each round
+        this.firstPlayer = 'player'; // player always goes first (KOTOR style unfairness)
         this.pendingPlusMinusCard = null;
     }
 
@@ -103,15 +103,16 @@ export class PazaakGame {
         this.player = new Player('Player', playerSideDeck);
         this.opponent = new Player('Opponent', generateAISideDeck());
         this.roundNumber = 1;
-        this.firstPlayer = Math.random() < 0.5 ? 'player' : 'opponent';
+        // Player always goes first - just like the unfair original KOTOR Pazaak!
+        // This gives the opponent a reactive advantage (~55/45 win rate)
+        this.firstPlayer = 'player';
         this.startRound();
     }
 
     startRound() {
         this.player.reset();
         this.opponent.reset();
-        this.player.sideDeck.reset();
-        this.opponent.sideDeck.reset();
+        // Side deck cards persist across rounds - only reset on new match (in resetMatch)
 
         // Draw first card for each player
         const playerCard = this.mainDeck.draw();
@@ -164,6 +165,13 @@ export class PazaakGame {
     playerEndTurn() {
         if (this.state !== GameState.PLAYER_TURN) return false;
 
+        // If player is over 20, they bust when ending turn
+        if (this.player.score > 20) {
+            this.player.busted = true;
+            this.checkAndEndRound();
+            return true;
+        }
+
         // Check if opponent is standing or busted
         if (this.opponent.standing || this.opponent.busted) {
             // Player draws again since opponent can't act
@@ -187,6 +195,13 @@ export class PazaakGame {
 
     playerStand() {
         if (this.state !== GameState.PLAYER_TURN) return false;
+
+        // If player is over 20, they bust when trying to stand
+        if (this.player.score > 20) {
+            this.player.busted = true;
+            this.checkAndEndRound();
+            return true;
+        }
 
         this.player.stand();
 
@@ -326,9 +341,14 @@ export class PazaakGame {
             if (this.player.busted || this.player.hasFilledBoard()) {
                 this.endRound();
             } else if (this.player.standing) {
-                // Player auto-stood at 20, opponent continues playing
-                // State stays as OPPONENT_TURN, notify so AI takes another turn
-                this.notifyStateChange();
+                // Player auto-stood at 20 (PAZAAK!)
+                // Check if opponent is also done - if so, end the round
+                if (this.opponent.standing || this.opponent.busted) {
+                    this.endRound();
+                } else {
+                    // Opponent continues playing
+                    this.notifyStateChange();
+                }
             } else {
                 this.currentTurn = 'player';
                 this.state = GameState.PLAYER_TURN;
@@ -413,8 +433,8 @@ export class PazaakGame {
     nextRound() {
         if (this.state !== GameState.ROUND_OVER) return false;
 
-        // Alternate who goes first
-        this.firstPlayer = this.firstPlayer === 'player' ? 'opponent' : 'player';
+        // Player always goes first - no alternation (unfair like KOTOR!)
+        this.firstPlayer = 'player';
         this.roundNumber++;
         this.startRound();
 
