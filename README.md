@@ -2,6 +2,9 @@
 
 A web-based recreation of the card game Pazaak from Star Wars: Knights of the Old Republic.
 
+<img width="657" height="790" alt="image" src="https://github.com/user-attachments/assets/656bd282-9563-4401-9719-7f2591633663" />
+
+
 ## How to Play
 
 **Objective:** Get as close to 20 as possible without going over. First player to win 3 rounds wins the match.
