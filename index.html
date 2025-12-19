@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pazaak</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main Menu Screen -->
+    <div id="menu-screen" class="screen active">
+        <div class="menu-container">
+            <h1 class="game-title">PAZAAK</h1>
+            <p class="subtitle">A Card Game from a Galaxy Far, Far Away</p>
+
+            <div class="stats-display" id="menu-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Matches Won</span>
+                    <span class="stat-value" id="stat-matches-won">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Matches Lost</span>
+                    <span class="stat-value" id="stat-matches-lost">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Win Streak</span>
+                    <span class="stat-value" id="stat-win-streak">0</span>
+                </div>
+            </div>
+
+            <div class="menu-buttons">
+                <button class="btn btn-primary" id="btn-play">Play Game</button>
+                <button class="btn btn-secondary" id="btn-deck-builder">Side Deck Builder</button>
+                <button class="btn btn-secondary" id="btn-how-to-play">How to Play</button>
+            </div>
+
+            <div class="sound-toggle">
+                <button class="btn btn-icon" id="btn-sound-toggle" title="Toggle Sound">
+                    <span id="sound-icon">🔊</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deck Builder Screen -->
+    <div id="deck-builder-screen" class="screen">
+        <div class="deck-builder-container">
+            <h2>Side Deck Builder</h2>
+            <p class="builder-info">Select 4 cards for your side deck</p>
+
+            <div class="selected-deck">
+                <h3>Your Side Deck (<span id="selected-count">0</span>/4)</h3>
+                <div class="selected-cards" id="selected-cards">
+                    <div class="card-slot empty"></div>
+                    <div class="card-slot empty"></div>
+                    <div class="card-slot empty"></div>
+                    <div class="card-slot empty"></div>
+                </div>
+            </div>
+
+            <div class="available-cards">
+                <h3>Available Cards</h3>
+                <div class="card-category">
+                    <h4>Plus Cards</h4>
+                    <div class="card-grid" id="plus-cards"></div>
+                </div>
+                <div class="card-category">
+                    <h4>Minus Cards</h4>
+                    <div class="card-grid" id="minus-cards"></div>
+                </div>
+                <div class="card-category">
+                    <h4>Plus/Minus Cards</h4>
+                    <div class="card-grid" id="plusminus-cards"></div>
+                </div>
+            </div>
+
+            <div class="builder-buttons">
+                <button class="btn btn-secondary" id="btn-clear-deck">Clear</button>
+                <button class="btn btn-primary" id="btn-save-deck">Save & Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Play Screen -->
+    <div id="how-to-play-screen" class="screen">
+        <div class="how-to-play-container">
+            <h2>How to Play Pazaak</h2>
+
+            <div class="rules-section">
+                <h3>Objective</h3>
+                <p>Get as close to 20 as possible without going over. First player to win 3 rounds wins the match.</p>
+            </div>
+
+            <div class="rules-section">
+                <h3>Gameplay</h3>
+                <ul>
+                    <li>Each turn, a card (1-10) is drawn from the main deck and added to your total.</li>
+                    <li>You can optionally play one card from your side deck to adjust your total.</li>
+                    <li><strong>End Turn:</strong> Pass to your opponent (or draw again if they've stood).</li>
+                    <li><strong>Stand:</strong> Lock in your score and stop drawing for this round.</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>Winning a Round</h3>
+                <ul>
+                    <li>If you go over 20, you bust and lose the round.</li>
+                    <li>The player closest to 20 (without busting) wins.</li>
+                    <li>A tie (same score) results in no points awarded.</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>Side Deck Cards</h3>
+                <ul>
+                    <li><strong>Plus (+):</strong> Adds to your total.</li>
+                    <li><strong>Minus (-):</strong> Subtracts from your total.</li>
+                    <li><strong>Plus/Minus (±):</strong> You choose to add or subtract.</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" id="btn-back-to-menu">Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="game-container">
+            <!-- Round Indicators -->
+            <div class="round-indicators">
+                <div class="round-indicator opponent-rounds">
+                    <span class="round-dot" id="opp-round-1"></span>
+                    <span class="round-dot" id="opp-round-2"></span>
+                    <span class="round-dot" id="opp-round-3"></span>
+                </div>
+                <div class="round-label">ROUNDS</div>
+                <div class="round-indicator player-rounds">
+                    <span class="round-dot" id="player-round-1"></span>
+                    <span class="round-dot" id="player-round-2"></span>
+                    <span class="round-dot" id="player-round-3"></span>
+                </div>
+            </div>
+
+            <!-- Opponent Area -->
+            <div class="player-area opponent-area">
+                <div class="player-info">
+                    <span class="player-name">Opponent</span>
+                    <span class="player-score">Score: <span id="opponent-score">0</span></span>
+                    <span class="player-status" id="opponent-status"></span>
+                </div>
+                <div class="played-cards" id="opponent-cards">
+                    <!-- Cards will be added here dynamically -->
+                </div>
+                <div class="side-deck opponent-side-deck" id="opponent-side-deck">
+                    <div class="side-card-slot"></div>
+                    <div class="side-card-slot"></div>
+                    <div class="side-card-slot"></div>
+                    <div class="side-card-slot"></div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="game-divider">
+                <div class="turn-indicator" id="turn-indicator">Your Turn</div>
+            </div>
+
+            <!-- Player Area -->
+            <div class="player-area player-area-bottom">
+                <div class="player-info">
+                    <span class="player-name">You</span>
+                    <span class="player-score">Score: <span id="player-score">0</span></span>
+                    <span class="player-status" id="player-status"></span>
+                </div>
+                <div class="played-cards" id="player-cards">
+                    <!-- Cards will be added here dynamically -->
+                </div>
+                <div class="side-deck player-side-deck" id="player-side-deck">
+                    <!-- Side deck cards will be added here dynamically -->
+                </div>
+            </div>
+
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <button class="btn btn-primary" id="btn-end-turn">End Turn</button>
+                <button class="btn btn-secondary" id="btn-stand">Stand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plus/Minus Choice Modal -->
+    <div id="plusminus-modal" class="modal">
+        <div class="modal-content">
+            <h3>Choose Card Effect</h3>
+            <p>Card value: <span id="modal-card-value"></span></p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="btn-choose-plus">Add (+)</button>
+                <button class="btn btn-secondary" id="btn-choose-minus">Subtract (-)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Round Result Modal -->
+    <div id="round-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="round-result-title">Round Over</h3>
+            <p id="round-result-message"></p>
+            <div class="round-scores">
+                <div class="round-score-item">
+                    <span>You</span>
+                    <span id="round-player-score">0</span>
+                </div>
+                <div class="round-score-item">
+                    <span>Opponent</span>
+                    <span id="round-opponent-score">0</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btn-next-round">Next Round</button>
+        </div>
+    </div>
+
+    <!-- Match Result Modal -->
+    <div id="match-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="match-result-title">Match Over</h3>
+            <p id="match-result-message"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="btn-play-again">Play Again</button>
+                <button class="btn btn-secondary" id="btn-return-menu">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
