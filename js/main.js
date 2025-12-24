@@ -106,6 +106,11 @@ class PazaakApp {
             this.clearBuilderDeck();
         });
 
+        document.getElementById('btn-random-deck').addEventListener('click', () => {
+            soundManager.buttonClick();
+            this.randomBuilderDeck();
+        });
+
         document.getElementById('btn-save-deck').addEventListener('click', () => {
             soundManager.buttonClick();
             this.saveBuilderDeck();
@@ -278,6 +283,18 @@ class PazaakApp {
 
     clearBuilderDeck() {
         this.selectedBuilderCards = [];
+        this.renderDeckBuilder();
+    }
+
+    randomBuilderDeck() {
+        console.log('Random deck clicked, available cards:', this.availableBuilderCards.length);
+        // Shuffle available cards and pick 4
+        const shuffled = [...this.availableBuilderCards].sort(() => Math.random() - 0.5);
+        this.selectedBuilderCards = shuffled.slice(0, 4).map(c => ({
+            type: c.type,
+            value: c.value
+        }));
+        console.log('Selected cards:', this.selectedBuilderCards);
         this.renderDeckBuilder();
     }
 
